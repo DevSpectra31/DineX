@@ -10,9 +10,11 @@ app.use(cookieparser());
 //import routes
 import Healthcheckroute from "./routes/healthcheck.routes.js";
 import UserRoute from "./routes/user.routes.js";
+import FoodRoute from "./routes/Food.route..js";
 
 //use routes
 app.use("/api/v1/healthcheck",Healthcheckroute);
 app.use("/api/v1/users/",UserRoute)
+app.use("/api/food/",FoodRoute)
 
 export default app;

@@ -71,6 +71,7 @@ async function loginUser(req, res) {
       user: {
         _id: user._id,
         email: user.email,
+        Username:user.Username,
       }
     });
 
@@ -108,7 +109,7 @@ async function registerFoodParnter(req,res){
      })
      // generate the token
      const token = jwt.sign({
-         id:partner._id,
+         _id:partner._id,
      },process.env.JWT_SECRET)
      res.cookie("token",token);
      res.status(201).json({
