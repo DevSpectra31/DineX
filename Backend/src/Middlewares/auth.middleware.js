@@ -4,8 +4,8 @@ import { FoodPartner } from "../models/FoodPartner.js";
 
 
 async function AuthFoodPartnerMiddleware(req,res,next){
-    const token = req.cookies.token;
-    //console.log("token : " ,token)
+    const token = req.cookies.token 
+    console.log("token : " ,token)
     if(!token){
         res.status(401).json({
             message : "Please login first"
@@ -13,9 +13,9 @@ async function AuthFoodPartnerMiddleware(req,res,next){
     }
     try {
         const decodedtoken= jwt.verify(token,process.env.JWT_SECRET)
-        //console.log("decodedtoken : " ,decodedtoken)
-        const foodPartner=await FoodPartner.findById(decodedtoken.id).select("-password");
-        //console.log("foodPartner : " ,foodPartner )
+        console.log("decodedtoken : " ,decodedtoken)
+        const foodPartner=await FoodPartner.findById(decodedtoken._id).select("-password");
+        console.log("foodPartner : " ,foodPartner )
         req.foodPartner=foodPartner;
         next();
     } catch (error) {
@@ -25,6 +25,8 @@ async function AuthFoodPartnerMiddleware(req,res,next){
     }
 }
 
-
+async function AuthUserMiddleware(req,res,next){
+    
+}
 
 export{AuthFoodPartnerMiddleware};

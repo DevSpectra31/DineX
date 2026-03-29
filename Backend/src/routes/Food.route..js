@@ -9,6 +9,7 @@ const upload = multer({
 })
 //protected API
 app.post('/',AuthFoodPartnerMiddleware,upload.single("video"),CreateFood);
+app.get()
 
 
 
