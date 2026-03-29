@@ -1,11 +1,16 @@
 // create server
 import express from "express";
 import cookieparser from "cookie-parser"
+import cors from "cors"
 const app=express();
 
 //middleware
 app.use(express.json());
 app.use(cookieparser());
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true,
+}))
 
 //import routes
 import Healthcheckroute from "./routes/healthcheck.routes.js";

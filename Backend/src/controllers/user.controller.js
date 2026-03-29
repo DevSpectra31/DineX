@@ -6,7 +6,7 @@ import { FoodPartner } from "../models/FoodPartner.js";
 //user
 async function registerUser(req,res){
    try {
-     const {Username,email,password}=req.body;
+     const {fullName,email,password}=req.body;
      const existeduser = await User.findOne({email});
  
      if(existeduser){
@@ -17,7 +17,7 @@ async function registerUser(req,res){
      //hash  password
      const hashedpassword = await bcrypt.hash(password,12);
      const user=await User.create({
-         Username,
+         fullName,
          email,
          password:hashedpassword,
      })
@@ -31,7 +31,7 @@ async function registerUser(req,res){
          user:{
              _id:user._id,
              email:user.email,
-             Username:user.Username,
+             fullName:user.fullName
          }
      })
    } catch ( error) {
@@ -92,7 +92,7 @@ async function logoutUser(req, res){
 //FoodPartner
 async function registerFoodParnter(req,res){
    try {
-     const {name,email,password}=req.body;
+     const {OwnerName,BusinessName,email,password,PhoneNumber,BusinessAddress,City,ZipCode}=req.body;
      const existedpartner = await FoodPartner.findOne({email});
  
      if(existedpartner){
@@ -103,9 +103,14 @@ async function registerFoodParnter(req,res){
      //hash  password
      const hashedpassword = await bcrypt.hash(password,12);
      const partner=await FoodPartner.create({
-         name,
-         email,
-         password:hashedpassword,
+      OwnerName,
+      BusinessName,
+      email,
+      password:hashedpassword,
+      PhoneNumber,
+      BusinessAddress,
+      City,
+      ZipCode,
      })
      // generate the token
      const token = jwt.sign({
@@ -117,7 +122,13 @@ async function registerFoodParnter(req,res){
          partner:{
              _id:partner._id,
              email:partner.email,
-             name:partner.name,
+             BusinessName:partner.BusinessName,
+             OwnerName:partner.OwnerName,
+             BusinessAddress:partner.BusinessAddress,
+             PhoneNumber:partner.PhoneNumber,
+             City:partner.City,
+             ZipCode:partner.ZipCode,
+
          }
      })
    } catch ( error) {

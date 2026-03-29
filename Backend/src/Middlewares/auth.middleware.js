@@ -1,6 +1,7 @@
 import { FoodModel } from "../models/Foodmodel.js";
 import jwt from "jsonwebtoken";
 import { FoodPartner } from "../models/FoodPartner.js";
+import { User } from "../models/user.model.js";
 
 
 async function AuthFoodPartnerMiddleware(req,res,next){
@@ -26,7 +27,25 @@ async function AuthFoodPartnerMiddleware(req,res,next){
 }
 
 async function AuthUserMiddleware(req,res,next){
-    
+     const token = req.cookies.token 
+    console.log("token : " ,token)
+    if(!token){
+        res.status(401).json({
+            message : "Please login first"
+        })
+    }
+    try {
+        const decodedtoken= jwt.verify(token,process.env.JWT_SECRET)
+        console.log("decodedtoken : " ,decodedtoken)
+        const loggeduser=await User.findById(decodedtoken._id).select("-password");
+        console.log("foodPartner : " ,loggeduser )
+        req.loggeduser=loggeduser
+        next();
+    } catch (error) {
+        return res.status(401).json({
+            message: error.message
+        })
+    }
 }
 
-export{AuthFoodPartnerMiddleware};
+export{AuthFoodPartnerMiddleware,AuthUserMiddleware};
