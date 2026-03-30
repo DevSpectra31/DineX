@@ -1,11 +1,33 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Auth/FoodPartnerLogin.css';
-
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 function FoodPartnerLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const navigate = useNavigate();
+  const handleLogin = async (e) => {
+  e.preventDefault();
 
+  const email = e.target.email.value;
+  const password = e.target.password.value;
+
+  console.log(email, password); // ✅ should work now
+
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/api/v1/users/loginPartner",
+      { email, password },
+      { withCredentials: true }
+    );
+
+    console.log("Success:", response.data);
+    navigate("/create-food");
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+  }
+};
   return (
     <div className="auth-container">
       <div className="auth-card">
@@ -15,12 +37,12 @@ function FoodPartnerLogin() {
           <p>Manage your food business account</p>
         </div>
 
-        <form className="auth-form">
+        <form className="auth-form" onSubmit={handleLogin}>
           <div className="form-group">
             <label htmlFor="businessEmail">Business Email</label>
             <input
               type="email"
-              id="businessEmail"
+              name='email'
               placeholder="Enter your business email"
               className="form-input"
             />
@@ -31,7 +53,7 @@ function FoodPartnerLogin() {
             <div className="password-input-wrapper">
               <input
                 type={showPassword ? 'text' : 'password'}
-                id="password"
+                name='password'
                 placeholder="Enter your password"
                 className="form-input"
               />
@@ -60,7 +82,7 @@ function FoodPartnerLogin() {
             </Link>
           </div>
 
-          <button type="submit" className="btn-primary btn-partner">
+          <button type="submit" className="btn-primary btn-partner" >
             Sign In to Dashboard
           </button>
         </form>

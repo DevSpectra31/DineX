@@ -1,9 +1,57 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Auth/FoodPartnerRegister.css';
+import axios from 'axios';
 
 function FoodPartnerRegister() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    const OwnerName = e.target.ownerName.value;
+    const BusinessName = e.target.businessName.value;
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    const PhoneNumber = e.target.phone.value;
+    const BusinessAddress = e.target.address.value;
+    const City = e.target.city.value;
+    const ZipCode = e.target.zipcode.value;
+
+    console.log({
+      OwnerName,
+      BusinessName,
+      email,
+      password,
+      PhoneNumber,
+      BusinessAddress,
+      City,
+      ZipCode,
+    });
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/v1/users/regsiterPartner",
+        {
+          OwnerName,
+          BusinessName,
+          email,
+          password,
+          PhoneNumber,
+          BusinessAddress,
+          City,
+          ZipCode,
+        },
+        { withCredentials: true }
+      );
+
+      console.log("Success:", response.data);
+      navigate("/create-food");
+    } catch (err) {
+      console.error("Error:", err.response?.data || err.message);
+    }
+  };
 
   return (
     <div className="auth-container">
@@ -14,12 +62,12 @@ function FoodPartnerRegister() {
           <p>Grow your food business with us</p>
         </div>
 
-        <form className="auth-form">
+        <form className="auth-form" onSubmit={handleRegister}>
           <div className="form-group">
-            <label htmlFor="businessName">Business Name</label>
+            <label>Business Name</label>
             <input
               type="text"
-              id="businessName"
+              name="businessName"
               placeholder="Enter your restaurant/food business name"
               className="form-input"
             />
@@ -27,42 +75,32 @@ function FoodPartnerRegister() {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="ownerName">Owner Name</label>
+              <label>Owner Name</label>
               <input
                 type="text"
-                id="ownerName"
+                name="ownerName"
                 placeholder="Your full name"
                 className="form-input"
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="businessType">Business Type</label>
-              <select className="form-input">
-                <option value="">Select type</option>
-                <option value="restaurant">Restaurant</option>
-                <option value="cafe">Café</option>
-                <option value="cloud-kitchen">Cloud Kitchen</option>
-                <option value="bakery">Bakery</option>
-                <option value="other">Other</option>
-              </select>
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="email">Email Address</label>
+              <label>Email Address</label>
               <input
                 type="email"
-                id="email"
+                name="email"
                 placeholder="Business email"
                 className="form-input"
               />
             </div>
+
             <div className="form-group">
-              <label htmlFor="phone">Phone Number</label>
+              <label>Phone Number</label>
               <input
                 type="tel"
-                id="phone"
+                name="phone"
                 placeholder="Contact number"
                 className="form-input"
               />
@@ -70,10 +108,10 @@ function FoodPartnerRegister() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="address">Business Address</label>
+            <label>Business Address</label>
             <input
               type="text"
-              id="address"
+              name="address"
               placeholder="Enter complete business address"
               className="form-input"
             />
@@ -81,52 +119,32 @@ function FoodPartnerRegister() {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="city">City</label>
+              <label>City</label>
               <input
                 type="text"
-                id="city"
+                name="city"
                 placeholder="City"
                 className="form-input"
               />
             </div>
+
             <div className="form-group">
-              <label htmlFor="zipcode">Zip Code</label>
+              <label>Zip Code</label>
               <input
                 type="text"
-                id="zipcode"
+                name="zipcode"
                 placeholder="Zip code"
                 className="form-input"
               />
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="gstin">GSTIN (Optional)</label>
-              <input
-                type="text"
-                id="gstin"
-                placeholder="Enter GSTIN if applicable"
-                className="form-input"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="licenseNo">License Number</label>
-              <input
-                type="text"
-                id="licenseNo"
-                placeholder="Food license number"
-                className="form-input"
-              />
-            </div>
-          </div>
-
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label>Password</label>
             <div className="password-input-wrapper">
               <input
                 type={showPassword ? 'text' : 'password'}
-                id="password"
+                name="password"
                 placeholder="Create a strong password"
                 className="form-input"
               />
@@ -143,7 +161,7 @@ function FoodPartnerRegister() {
           <div className="form-checkbox">
             <input type="checkbox" id="terms" />
             <label htmlFor="terms">
-              I agree to Partner <a href="#terms">Terms & Conditions</a>
+              I agree to Partner Terms & Conditions
             </label>
           </div>
 

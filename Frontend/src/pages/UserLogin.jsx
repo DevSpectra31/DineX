@@ -4,29 +4,30 @@ import '../styles/Auth/UserLogin.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 function UserLogin() {
-    const nagivate = useNavigate();
+    const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const handleLogin = (e) => {
-    e.preventDefault();
-    const email = e.target.value.email;
-    const password = e.target.value.password;
+const handleLogin = async (e) => {
+  e.preventDefault();
 
-   const response= axios.post("http://localhost:5000/api/v1/users/login", {
-      email:email,
-      password:password,
-    },{
-        withCredentials:true,
-    })
-    .then((res) => {
-      console.log("Success:", res.data);
-      nagivate("/")
-    })
-    .catch((err) => {
-      console.error("Error:", err.response?.data || err.message);
-    });
-  };
+  const email = e.target.email.value;
+  const password = e.target.password.value;
 
+  console.log(email, password); // ✅ should work now
+
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/api/v1/users/login",
+      { email, password },
+      { withCredentials: true }
+    );
+
+    console.log("Success:", response.data);
+    navigate("/");
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+  }
+};
   return (
     <div className="auth-container">
       <div className="auth-card">
@@ -35,12 +36,13 @@ function UserLogin() {
           <p>Sign in to your account to continue</p>
         </div>
 
-        <form className="auth-form">
+        <form className="auth-form"  onSubmit={handleLogin}>
           <div className="form-group">
             <label htmlFor="email">Email Address</label>
             <input
               type="email"
               id="email"
+              name='email'
               placeholder="Enter your email"
               className="form-input"
             />
@@ -52,6 +54,7 @@ function UserLogin() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
+                name='password'
                 placeholder="Enter your password"
                 className="form-input"
               />
@@ -80,7 +83,7 @@ function UserLogin() {
             </Link>
           </div>
 
-          <button type="submit" className="btn-primary" onClick={handleLogin}>
+          <button type="submit" className="btn-primary" >
             Sign In
           </button>
         </form>

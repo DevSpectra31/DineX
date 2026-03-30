@@ -44,7 +44,8 @@ async function registerUser(req,res){
 async function loginUser(req, res) {
   try {
     const { email, password } = req.body;
-
+    console.log(email);
+    console.log(password)
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -185,5 +186,4 @@ async function logoutFoodPartner(req, res){
         message:"FoodPartner logout successfully"
     })
 }
-
 export{registerUser,loginUser ,logoutUser,registerFoodParnter,loginFoodPartner,logoutFoodPartner}
