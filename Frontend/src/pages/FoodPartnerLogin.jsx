@@ -22,12 +22,15 @@ function FoodPartnerLogin() {
       { withCredentials: true }
     );
 
-    console.log("Success:", response.data);
-    navigate("/create-food");
-  } catch (err) {
-    console.error(err.response?.data || err.message);
-  }
-};
+      console.log("Success:", response.data);
+      const partnerId = response.data?.partner?._id;
+      if (partnerId) {
+        navigate(`/create-food/${partnerId}`);
+      }
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    }
+  };
   return (
     <div className="auth-container">
       <div className="auth-card">

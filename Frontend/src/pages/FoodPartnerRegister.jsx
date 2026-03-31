@@ -47,7 +47,10 @@ function FoodPartnerRegister() {
       );
 
       console.log("Success:", response.data);
-      navigate("/create-food");
+      const partnerId = response.data?.partner?._id;
+      if (partnerId) {
+        navigate(`/create-food/${partnerId}`);
+      }
     } catch (err) {
       console.error("Error:", err.response?.data || err.message);
     }
