@@ -16,10 +16,11 @@ app.use(cors({
 import Healthcheckroute from "./routes/healthcheck.routes.js";
 import UserRoute from "./routes/user.routes.js";
 import FoodRoute from "./routes/Food.route..js";
-
+import FoodPartnerRoute from "./routes/FoodPartner.route.js";
 //use routes
 app.use("/api/v1/healthcheck",Healthcheckroute);
 app.use("/api/v1/users/",UserRoute)
 app.use("/api/food/",FoodRoute)
+app.use("/api/food-partner/",FoodPartnerRoute)
 
 export default app;

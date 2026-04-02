@@ -66,7 +66,7 @@ async function loginUser(req, res) {
       { _id: user._id },
       process.env.JWT_SECRET
     );
-
+     res.cookie("token",token)
     return res.status(200).json({
       message: "user successfully logged in",
       user: {
@@ -163,13 +163,19 @@ async function loginFoodPartner(req, res) {
       { _id: partner._id },
       process.env.JWT_SECRET
     );
-
+    res.cookie("token",token)
     return res.status(200).json({
       message: "FoodPartner successfully logged in",
       partner: {
         _id: partner._id,
+        BusinessName:partner.BusinessName,
         email: partner.email,
-        name : partner.name,
+        OwnerName:partner.OwnerName,
+        PhoneNumber:partner.PhoneNumber,
+        BusinessAddress:partner.BusinessAddress,
+        City:partner.City,
+        ZipCode:partner.ZipCode,
+        
       }
     });
 
@@ -183,7 +189,8 @@ async function loginFoodPartner(req, res) {
 async function logoutFoodPartner(req, res){
     res.clearCookie("token");
     res.status(201).json({
-        message:"FoodPartner logout successfully"
+        message:"FoodPartner logout successfully",
+
     })
 }
 export{registerUser,loginUser ,logoutUser,registerFoodParnter,loginFoodPartner,logoutFoodPartner}

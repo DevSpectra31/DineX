@@ -2,14 +2,17 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios';
 import '../../styles/ReelsContainer.css'
-
+import { useNavigate } from 'react-router-dom';
 const Home = () => {
 
     const [videos, setVideos] = useState([])
     const [currentIndex, setCurrentIndex] = useState(0)
+    const [failedVideoIds, setFailedVideoIds] = useState([])
     const videoRefs = useRef(new Map())
     const containerRef = useRef(null)
     const scrollTimeoutRef = useRef(null)
+const router = useNavigate();
+    const visibleVideos = videos.filter((item) => !failedVideoIds.includes(item._id))
 
     useEffect(() => {
         axios.get("http://localhost:5000/api/food/", { withCredentials: true })
@@ -38,11 +41,11 @@ const Home = () => {
 
         scrollTimeoutRef.current = setTimeout(() => {
             const container = containerRef.current
-            if (!container || videos.length === 0) return
+            if (!container || visibleVideos.length === 0) return
 
             const scrollTop = container.scrollTop
             const itemHeight = container.offsetHeight
-            const index = Math.max(0, Math.min(Math.round(scrollTop / itemHeight), videos.length - 1))
+            const index = Math.max(0, Math.min(Math.round(scrollTop / itemHeight), visibleVideos.length - 1))
 
             setCurrentIndex(index)
             container.scrollTo({
@@ -53,9 +56,11 @@ const Home = () => {
     }
 
     const handleKeyDown = (e) => {
+        if (visibleVideos.length === 0) return
+
         if (e.key === 'ArrowDown') {
             e.preventDefault()
-            const nextIndex = Math.min(currentIndex + 1, videos.length - 1)
+            const nextIndex = Math.min(currentIndex + 1, visibleVideos.length - 1)
             scrollToIndex(nextIndex)
         } else if (e.key === 'ArrowUp') {
             e.preventDefault()
@@ -66,11 +71,13 @@ const Home = () => {
 
     const scrollToIndex = (index) => {
         const container = containerRef.current
-        if (!container) return
+        if (!container || visibleVideos.length === 0) return
 
-        setCurrentIndex(index)
+        const safeIndex = Math.max(0, Math.min(index, visibleVideos.length - 1))
+
+        setCurrentIndex(safeIndex)
         container.scrollTo({
-            top: index * container.offsetHeight,
+            top: safeIndex * container.offsetHeight,
             behavior: 'smooth',
         })
     }
@@ -84,7 +91,7 @@ const Home = () => {
     }, [])
 
     useEffect(() => {
-        videos.forEach((item, index) => {
+        visibleVideos.forEach((item, index) => {
             const video = videoRefs.current.get(item._id)
             if (!video) return
 
@@ -100,7 +107,27 @@ const Home = () => {
                 }
             }
         })
-    }, [currentIndex, videos])
+    }, [currentIndex, visibleVideos])
+
+    useEffect(() => {
+        if (visibleVideos.length === 0) {
+            setCurrentIndex(0)
+            return;
+        }
+
+        if (currentIndex >= visibleVideos.length) {
+            setCurrentIndex(visibleVideos.length - 1)
+        }
+    }, [currentIndex, visibleVideos.length])
+
+    const handleVideoError = (id, event) => {
+        console.error("Video error:", id, event)
+
+        videoRefs.current.delete(id)
+        setFailedVideoIds((prev) => (
+            prev.includes(id) ? prev : [...prev, id]
+        ))
+    }
 
     return (
         <div
@@ -111,7 +138,19 @@ const Home = () => {
             onKeyDown={handleKeyDown}
         >
             <div className="reels-feed" role="list">
-                {videos.map((item, index) => (
+                {visibleVideos.length === 0 && (
+                    <section className="reel" role="listitem">
+                        <div className="reel-overlay">
+                            <div className="reel-overlay-gradient" aria-hidden="true"></div>
+                            <div className="reel-content">
+                                <p className="reel-description">
+                                    No playable videos are available right now.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                )}
+                {visibleVideos.map((item, index) => (
                     <section 
                         key={item._id} 
                         className="reel" 
@@ -127,7 +166,7 @@ const Home = () => {
                             loop
                             preload={index === currentIndex ? "auto" : "metadata"}
                             onLoadedMetadata={() => console.log("Video loaded:", item._id)}
-                            onError={(e) => console.error("Video error:", item._id, e)}
+                            onError={(e) => handleVideoError(item._id, e)}
                         />
 
                         <div className="reel-overlay">
@@ -137,7 +176,7 @@ const Home = () => {
                                     {item.description}
                                 </p>
                                 <div className="reel-buttons">
-                                    <Link className="reel-btn visit-btn" to={"/food-partner"+item.storeUrl} aria-label="Visit store">
+                                    <Link className="reel-btn visit-btn" to="/food-partner/profile" aria-label="Visit store">
                                         🏪 Visit Store
                                     </Link>
                                     <button className="reel-btn share-btn" aria-label="Share">

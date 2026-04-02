@@ -35,10 +35,11 @@ async function AuthUserMiddleware(req,res,next){
         })
     }
     try {
+        console.log("TOKEN:", token)
+        console.log("DECODED:", decodedtoken)
+        console.log("FOUND USER:", foodPartner)
         const decodedtoken= jwt.verify(token,process.env.JWT_SECRET)
-        console.log("decodedtoken : " ,decodedtoken)
         const loggeduser=await User.findById(decodedtoken._id).select("-password");
-        console.log("foodPartner : " ,loggeduser )
         req.loggeduser=loggeduser
         next();
     } catch (error) {
