@@ -28,13 +28,6 @@ function Profile() {
       });
   }, []);
 
-  const displayStatus =
-    status === 'loading'
-      ? 'loading'
-      : status === 'error'
-        ? 'error'
-        : 'active';
-
   return (
     <div className="partner-profile-page">
       <div className="partner-profile-shell">
@@ -62,12 +55,6 @@ function Profile() {
                 <strong>15K</strong>
               </div>
             </div>
-            <div className="partner-stats-row">
-              <div className="partner-stat-card">
-                <span>status</span>
-                <strong>{displayStatus}</strong>
-              </div>
-            </div>
             {status === 'error' && error ? (
               <div className="partner-stat-card">
                 <span>error</span>
@@ -79,11 +66,25 @@ function Profile() {
           <div className="partner-grid-divider" />
 
           <div className="partner-video-grid">
-            {videos.map((tile) => (
-              <button className="partner-video-tile" type="button" key={tile.id}>
-                <video style={{objectFit:'cover',width:'100%', height:'100'}}src={tile.video} muted></video>
-              </button>
-            ))}
+            {videos.length > 0
+              ? videos.map((tile) => (
+                  <button
+                    className="partner-video-tile"
+                    type="button"
+                    key={tile.id}
+                  >
+                    <video
+                      className="partner-video-preview"
+                      src={tile.video}
+                      muted
+                    />
+                  </button>
+                ))
+              : Array.from({ length: 9 }).map((_, index) => (
+                  <div className="partner-video-tile" key={`empty-${index}`}>
+                    <span>video</span>
+                  </div>
+                ))}
           </div>
         </div>
       </div>

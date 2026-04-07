@@ -3,16 +3,18 @@ import { Link } from 'react-router-dom';
 import '../styles/Auth/FoodPartnerLogin.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+ import { ToastContainer, toast } from 'react-toastify';
 function FoodPartnerLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const notify = ()=>{
+    return toast("Welcome Back");
+  }
   const handleLogin = async (e) => {
   e.preventDefault();
-
   const email = e.target.email.value;
   const password = e.target.password.value;
-
   console.log(email, password); // ✅ should work now
 
   try {
@@ -22,7 +24,8 @@ function FoodPartnerLogin() {
       { withCredentials: true }
     );
 
-      console.log("Success:", response.data);
+      //console.log("Success:", response.data);
+      notify();
       const partnerId = response.data?.partner?._id;
       if (partnerId) {
         navigate(`/create-food/${partnerId}`);

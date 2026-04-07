@@ -6,6 +6,8 @@ import FoodPartnerRegister from '../pages/FoodPartnerRegister'
 import FoodPartnerLogin from '../pages/FoodPartnerLogin'
 import Home from '../pages/general/Home'
 import Profile from '../pages/food-partner/Profile'
+import CreateFoodPartner from '../pages/food-partner/CreateFoodPartner'
+import { ToastContainer } from 'react-toastify'
 
 function AppRoute() {
   return (
@@ -17,6 +19,7 @@ function AppRoute() {
             <Route path='/food-partner/login' element = {<FoodPartnerLogin/>}/>
             <Route path='/food-partner/profile' element={<Profile/>} />
             <Route path='/food-partner/:id' element={<Profile/>} />
+            <Route path='/food-partner/create-food' element={<CreateFoodPartner/>} />
             <Route path='/' element={<Home/>}/>
         </Routes>
     </Router>
