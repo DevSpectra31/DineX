@@ -1,118 +1,169 @@
-import React, { useEffect, useState } from 'react'
-import '../../styles/CreateFoodPartner.css'
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+import axios from 'axios';
+import '../../styles/CreateFoodPartner.css';
+import { useNavigate } from 'react-router-dom';
 
-function CreateFoodPartner() {
-  const [videoFile, setVideoFile] = useState(null)
-  const [videoPreview, setVideoPreview] = useState('')
-  const onSubmit = (e)=>{
-    e.preventDefault();
-    const fromdata = new FormData();
-    fromdata.append('name',name)
-    fromdata.append('description',)
-  }
-  useEffect(() => {
-    if (!videoFile) {
-      setVideoPreview('')
-      return undefined
-    }
+const CreateFood = () => {
+    const [ name, setName ] = useState('');
+    const [ description, setDescription ] = useState('');
+    const [ videoFile, setVideoFile ] = useState(null);
+    const [ videoURL, setVideoURL ] = useState('');
+    const [ fileError, setFileError ] = useState('');
+    const fileInputRef = useRef(null);
 
-    const objectUrl = URL.createObjectURL(videoFile)
-    setVideoPreview(objectUrl)
+    const navigate = useNavigate();
 
-    return () => {
-      URL.revokeObjectURL(objectUrl)
-    }
-  }, [videoFile])
+    useEffect(() => {
+        if (!videoFile) {
+            setVideoURL('');
+            return;
+        }
+        const url = URL.createObjectURL(videoFile);
+        setVideoURL(url);
+        return () => URL.revokeObjectURL(url);
+    }, [ videoFile ]);
 
-  const handleVideoChange = (event) => {
-    const file = event.target.files && event.target.files[0]
-    setVideoFile(file || null)
-  }
+    const onFileChange = (e) => {
+        const file = e.target.files && e.target.files[ 0 ];
+        if (!file) { setVideoFile(null); setFileError(''); return; }
+        if (!file.type.startsWith('video/')) { setFileError('Please select a valid video file.'); return; }
+        setFileError('');
+        setVideoFile(file);
+    };
 
-  return (
-    <div className="create-food-page">
-      <div className="create-food-shell">
-        <div className="create-food-card">
-          <header className="create-food-header">
-            <span className="create-food-badge">New Dish</span>
-            <h1>Create Food</h1>
-            <p>Share a short video, name, and description to publish your dish.</p>
-          </header>
+    const onDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const file = e.dataTransfer?.files?.[ 0 ];
+        if (!file) { return; }
+        if (!file.type.startsWith('video/')) { setFileError('Please drop a valid video file.'); return; }
+        setFileError('');
+        setVideoFile(file);
+    };
 
-          <form className="create-food-form">
-            <label className="create-food-field span-2">
-              <span>Food Video</span>
-              <div className="create-food-upload">
-                <input
-                  className="create-food-file"
-                  type="file"
-                  accept="video/*"
-                  onChange={handleVideoChange}
-                />
-                <div className="create-food-upload-content">
-                  <div className="create-food-upload-icon" aria-hidden="true">
-                    <svg viewBox="0 0 48 48" focusable="false">
-                      <path
-                        d="M16 12.5h10.2l2.3 3H34a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6v-13a6 6 0 0 1 6-6h2z"
-                        fill="currentColor"
-                        opacity="0.12"
-                      />
-                      <path
-                        d="M22.4 22.6a1.2 1.2 0 0 0-1.8 1v6.8a1.2 1.2 0 0 0 1.8 1l5.8-3.4a1.2 1.2 0 0 0 0-2l-5.8-3.4z"
-                        fill="currentColor"
-                      />
-                      <path
-                        d="M16 12.5h10.2l2.3 3H34a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6v-13a6 6 0 0 1 6-6h2z"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <strong>{videoFile ? 'Replace video' : 'Tap to upload'}</strong>
-                  <span>MP4, MOV, or WEBM up to 60s</span>
-                </div>
-              </div>
-              {videoPreview ? (
-                <div className="create-food-preview">
-                  <video
-                    className="create-food-preview-video"
-                    src={videoPreview}
-                    controls
-                    playsInline
-                    muted
-                  />
-                  <div className="create-food-preview-meta">
-                    <span>{videoFile?.name}</span>
-                    <span>{Math.round((videoFile?.size || 0) / 1024)} KB</span>
-                  </div>
-                </div>
-              ) : null}
-            </label>
+    const onDragOver = (e) => {
+        e.preventDefault();
+    };
 
-            <label className="create-food-field">
-              <span>Food Name</span>
-              <input className="create-food-input" type="text" placeholder="e.g. Spicy Paneer Bowl" />
-            </label>
+    const openFileDialog = () => fileInputRef.current?.click();
 
-            <label className="create-food-field">
-              <span>Description</span>
-              <textarea
-                className="create-food-input create-food-textarea"
-                rows="4"
-                placeholder="Describe ingredients, spice level, and best pairings."
-              />
-            </label>
+    const onSubmit = async (e) => {
+        e.preventDefault();
 
-            <button className="create-food-button span-2" type="submit">
-              Create Food
-            </button>
-          </form>
+        const formData = new FormData();
+
+        formData.append('name', name);
+        formData.append('description', description);
+        formData.append("video", videoFile);
+
+        const response = await axios.post("http://localhost:5000/api/food", formData, {
+            withCredentials: true,
+        })
+
+        console.log(response.data);
+        navigate("/"); // Redirect to home or another page after successful creation
+        // Optionally reset
+        // setName(''); setDescription(''); setVideoFile(null);
+    };
+
+    const isDisabled = useMemo(() => !name.trim() || !videoFile, [ name, videoFile ]);
+
+    return (
+        <div className="create-food-page">
+            <div className="create-food-card">
+                <header className="create-food-header">
+                    <h1 className="create-food-title">Create Food</h1>
+                    <p className="create-food-subtitle">Upload a short video, give it a name, and add a description.</p>
+                </header>
+
+                <form className="create-food-form" onSubmit={onSubmit}>
+                    <div className="field-group">
+                        <label htmlFor="foodVideo">Food Video</label>
+                        <input
+                            id="foodVideo"
+                            ref={fileInputRef}
+                            className="file-input-hidden"
+                            type="file"
+                            accept="video/*"
+                            onChange={onFileChange}
+                        />
+
+                        <div
+                            className="file-dropzone"
+                            role="button"
+                            tabIndex={0}
+                            onClick={openFileDialog}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFileDialog(); } }}
+                            onDrop={onDrop}
+                            onDragOver={onDragOver}
+                        >
+                            <div className="file-dropzone-inner">
+                                <svg className="file-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M10.8 3.2a1 1 0 0 1 .4-.08h1.6a1 1 0 0 1 1 1v1.6h1.6a1 1 0 0 1 1 1v1.6h1.6a1 1 0 0 1 1 1v7.2a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6.4a1 1 0 0 1 1-1h1.6V3.2a1 1 0 0 1 1-1h1.6a1 1 0 0 1 .6.2z" stroke="currentColor" strokeWidth="1.5" />
+                                    <path d="M9 12.75v-1.5c0-.62.67-1 1.2-.68l4.24 2.45c.53.3.53 1.05 0 1.35L10.2 16.82c-.53.31-1.2-.06-1.2-.68v-1.5" fill="currentColor" />
+                                </svg>
+                                <div className="file-dropzone-text">
+                                    <strong>Tap to upload</strong> or drag and drop
+                                </div>
+                                <div className="file-hint">MP4, WebM, MOV - Up to ~100MB</div>
+                            </div>
+                        </div>
+
+                        {fileError && <p className="error-text" role="alert">{fileError}</p>}
+
+                        {videoFile && (
+                            <div className="file-chip" aria-live="polite">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                                    <path d="M9 12.75v-1.5c0-.62.67-1 1.2-.68l4.24 2.45c.53.3.53 1.05 0 1.35L10.2 16.82c-.53.31-1.2-.06-1.2-.68v-1.5" />
+                                </svg>
+                                <span className="file-chip-name">{videoFile.name}</span>
+                                <span className="file-chip-size">{(videoFile.size / 1024 / 1024).toFixed(1)} MB</span>
+                                <div className="file-chip-actions">
+                                    <button type="button" className="btn-ghost" onClick={openFileDialog}>Change</button>
+                                    <button type="button" className="btn-ghost danger" onClick={() => { setVideoFile(null); setFileError(''); }}>Remove</button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {videoURL && (
+                        <div className="video-preview span-2">
+                            <video className="video-preview-el" src={videoURL} controls playsInline preload="metadata" />
+                        </div>
+                    )}
+
+                    <div className="field-group">
+                        <label htmlFor="foodName">Name</label>
+                        <input
+                            id="foodName"
+                            type="text"
+                            placeholder="e.g., Spicy Paneer Wrap"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="field-group span-2">
+                        <label htmlFor="foodDesc">Description</label>
+                        <textarea
+                            id="foodDesc"
+                            rows={4}
+                            placeholder="Write a short description: ingredients, taste, spice level, etc."
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="form-actions span-2">
+                        <button className="btn-primary" type="submit" disabled={isDisabled}>
+                            Save Food
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
-    </div>
-  )
-}
+    );
+};
 
-export default CreateFoodPartner
+export default CreateFood;

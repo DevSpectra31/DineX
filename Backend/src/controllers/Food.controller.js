@@ -3,6 +3,7 @@ import { AuthFoodPartnerMiddleware  } from "../Middlewares/auth.middleware.js";
 import {uploadFile} from "../services/storage.service.js";
 import { v4 as uuidv4 } from 'uuid';
 import path from "path";
+import { Likes } from "../models/Likes.model.js";
 
 const mimeExtensionMap = {
     "video/mp4": ".mp4",
@@ -70,6 +71,9 @@ async function GetFoodItem(req,res){
         fooditems,
     })
 }
-
+async function likeFood(req,res){
+    const {foodid} = req.body;
+    const like = await Likes
+}
 
 export{CreateFood,GetFoodItem}

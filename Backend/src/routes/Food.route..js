@@ -1,5 +1,5 @@
 import express from "express";
-import { AuthFoodPartnerMiddleware } from "../Middlewares/auth.middleware.js";
+import { AuthFoodPartnerMiddleware, AuthUserMiddleware } from "../Middlewares/auth.middleware.js";
 import { CreateFood ,GetFoodItem } from "../controllers/Food.controller.js";
 import multer from "multer";
 const app =express.Router();
@@ -10,8 +10,7 @@ const upload = multer({
 //protected API
 app.post('/', AuthFoodPartnerMiddleware, upload.single("video"), CreateFood);
 app.get('/',AuthFoodPartnerMiddleware,GetFoodItem)
-
-
+app.post('/likes',AuthUserMiddleware,)
 
 
 export default app;
