@@ -1,195 +1,250 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import axios from 'axios'
 import { Link } from 'react-router-dom'
-import axios from 'axios';
-import '../../styles/ReelsContainer.css'
-import { useNavigate } from 'react-router-dom';
+import PhoneBottomNav from '../../components/reels/PhoneBottomNav'
+import { BookmarkIcon, CommentIcon, HeartIcon } from '../../components/reels/ReelIcons'
+import '../../styles/ShortVideoUI.css'
+
+const getCount = (item, keys) => {
+  for (const key of keys) {
+    const value = item?.[key]
+    if (typeof value === 'number') return value
+  }
+
+  return 0
+}
+
 const Home = () => {
+  const [videos, setVideos] = useState([])
+  const [failedVideoIds, setFailedVideoIds] = useState([])
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [readyVideoIds, setReadyVideoIds] = useState([])
+  const wheelLockedRef = useRef(false)
+  const touchStartYRef = useRef(0)
+  const videoRefs = useRef(new Map())
 
-    const [videos, setVideos] = useState([])
-    const [currentIndex, setCurrentIndex] = useState(0)
-    const [failedVideoIds, setFailedVideoIds] = useState([])
-    const videoRefs = useRef(new Map())
-    const containerRef = useRef(null)
-    const scrollTimeoutRef = useRef(null)
-const router = useNavigate();
-    const visibleVideos = videos.filter((item) => !failedVideoIds.includes(item._id))
-
-    useEffect(() => {
-        axios.get("http://localhost:5000/api/food/", { withCredentials: true })
-            .then(response => {
-                console.log("API Response:", response.data);
-                if (response.data.fooditems) {
-                    console.log("First video item:", response.data.fooditems[0]);
-                    setVideos(response.data.fooditems)
-                }
-            })
-            .catch(error => {
-                console.error("API Error:", error)
-            })
-    }, [])
-
-    const setVideoRef = (id) => (el) => {
-        if (!el) {
-            videoRefs.current.delete(id)
-            return
+  useEffect(() => {
+    axios
+      .get('http://localhost:5000/api/food/', { withCredentials: true })
+      .then((response) => {
+        if (Array.isArray(response.data?.fooditems)) {
+            console.log(response.data)
+          setVideos(response.data.fooditems)
         }
-        videoRefs.current.set(id, el)
+      })
+      .catch((error) => {
+        console.error('API Error:', error)
+      })
+  }, [])
+
+  const visibleVideos = useMemo(
+    () => videos.filter((item) => !failedVideoIds.includes(item._id)),
+    [failedVideoIds, videos]
+  )
+
+  const handleVideoError = (id) => {
+    setFailedVideoIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+    setReadyVideoIds((prev) => prev.filter((videoId) => videoId !== id))
+  }
+
+  const handleVideoReady = (id) => {
+    setReadyVideoIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+  }
+
+  const setVideoRef = (id) => (element) => {
+    if (!element) {
+      videoRefs.current.delete(id)
+      return
     }
 
-    const handleScroll = (e) => {
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+    videoRefs.current.set(id, element)
+  }
 
-        scrollTimeoutRef.current = setTimeout(() => {
-            const container = containerRef.current
-            if (!container || visibleVideos.length === 0) return
+  const goToIndex = (index) => {
+    if (visibleVideos.length === 0) return
+    const safeIndex = Math.max(0, Math.min(index, visibleVideos.length - 1))
+    if (safeIndex === currentIndex) return
 
-            const scrollTop = container.scrollTop
-            const itemHeight = container.offsetHeight
-            const index = Math.max(0, Math.min(Math.round(scrollTop / itemHeight), visibleVideos.length - 1))
+    setCurrentIndex(safeIndex)
+  }
 
-            setCurrentIndex(index)
-            container.scrollTo({
-                top: index * itemHeight,
-                behavior: 'smooth',
-            })
-        }, 100)
+  const handleWheel = (event) => {
+    if (visibleVideos.length <= 1) return
+
+    event.preventDefault()
+    if (wheelLockedRef.current) return
+
+    wheelLockedRef.current = true
+    if (event.deltaY > 0) {
+      goToIndex(currentIndex + 1)
+    } else if (event.deltaY < 0) {
+      goToIndex(currentIndex - 1)
     }
 
-    const handleKeyDown = (e) => {
-        if (visibleVideos.length === 0) return
+    window.setTimeout(() => {
+      wheelLockedRef.current = false
+    }, 650)
+  }
 
-        if (e.key === 'ArrowDown') {
-            e.preventDefault()
-            const nextIndex = Math.min(currentIndex + 1, visibleVideos.length - 1)
-            scrollToIndex(nextIndex)
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault()
-            const prevIndex = Math.max(currentIndex - 1, 0)
-            scrollToIndex(prevIndex)
-        }
+  const handleTouchStart = (event) => {
+    touchStartYRef.current = event.touches[0]?.clientY || 0
+  }
+
+  const handleTouchEnd = (event) => {
+    const endY = event.changedTouches[0]?.clientY || 0
+    const diff = touchStartYRef.current - endY
+
+    if (Math.abs(diff) < 36) return
+    if (diff > 0) {
+      goToIndex(currentIndex + 1)
+    } else {
+      goToIndex(currentIndex - 1)
+    }
+  }
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'ArrowDown') goToIndex(currentIndex + 1)
+    if (event.key === 'ArrowUp') goToIndex(currentIndex - 1)
+  }
+
+  useEffect(() => {
+    if (visibleVideos.length === 0) {
+      setCurrentIndex(0)
+      return
     }
 
-    const scrollToIndex = (index) => {
-        const container = containerRef.current
-        if (!container || visibleVideos.length === 0) return
-
-        const safeIndex = Math.max(0, Math.min(index, visibleVideos.length - 1))
-
-        setCurrentIndex(safeIndex)
-        container.scrollTo({
-            top: safeIndex * container.offsetHeight,
-            behavior: 'smooth',
-        })
+    if (currentIndex > visibleVideos.length - 1) {
+      setCurrentIndex(visibleVideos.length - 1)
     }
+  }, [currentIndex, visibleVideos.length])
 
-    useEffect(() => {
-        containerRef.current?.focus()
+  useEffect(() => {
+    visibleVideos.forEach((item, index) => {
+      const video = videoRefs.current.get(item._id)
+      if (!video) return
 
-        return () => {
-            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+      if (index === currentIndex) {
+        const playPromise = video.play()
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {})
         }
-    }, [])
+      } else {
+        video.pause()
+        video.currentTime = 0
+      }
+    })
+  }, [currentIndex, visibleVideos])
+  async function Likevideo(item) {
+  const response = await axios.post(
+    'http://localhost:5000/api/food/likes',
+    { foodId: item._id },
+    { withCredentials: true }
+  );
 
-    useEffect(() => {
-        visibleVideos.forEach((item, index) => {
-            const video = videoRefs.current.get(item._id)
-            if (!video) return
+  const action = response.data?.action;
 
-            if (index === currentIndex) {
-                const playPromise = video.play()
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => console.error("Play error:", error))
-                }
-            } else {
-                video.pause()
-                if (video.currentTime !== 0) {
-                    video.currentTime = 0
-                }
-            }
-        })
-    }, [currentIndex, visibleVideos])
+  setVideos((prev) =>
+    prev.map((v) => {
+      if (v._id !== item._id) return v;
 
-    useEffect(() => {
-        if (visibleVideos.length === 0) {
-            setCurrentIndex(0)
-            return;
-        }
+      if (action === "liked") {
+        return {
+          ...v,
+          likeCount: (v.likeCount || 0) + 1,
+        };
+      }
 
-        if (currentIndex >= visibleVideos.length) {
-            setCurrentIndex(visibleVideos.length - 1)
-        }
-    }, [currentIndex, visibleVideos.length])
+      if (action === "unliked") {
+        return {
+          ...v,
+          likeCount: Math.max(0, (v.likeCount || 0) - 1),
+        };
+      }
 
-    const handleVideoError = (id, event) => {
-        console.error("Video error:", id, event)
-
-        videoRefs.current.delete(id)
-        setFailedVideoIds((prev) => (
-            prev.includes(id) ? prev : [...prev, id]
-        ))
-    }
-
-    return (
-        <div
-            ref={containerRef}
-            className="reels-page"
-            tabIndex={0}
-            onScroll={handleScroll}
-            onKeyDown={handleKeyDown}
+      return v;
+    })
+  );
+}
+  return (
+    <div className="short-video-screen">
+      <main className="phone-shell video-shell" aria-label="Video feed">
+        <section
+          className="video-stage"
+          onWheel={handleWheel}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
         >
-            <div className="reels-feed" role="list">
-                {visibleVideos.length === 0 && (
-                    <section className="reel" role="listitem">
-                        <div className="reel-overlay">
-                            <div className="reel-overlay-gradient" aria-hidden="true"></div>
-                            <div className="reel-content">
-                                <p className="reel-description">
-                                    No playable videos are available right now.
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-                )}
-                {visibleVideos.map((item, index) => (
-                    <section 
-                        key={item._id} 
-                        className="reel" 
-                        role="listitem"
-                    >
-                        <video
-                            ref={setVideoRef(item._id)}
-                            className="reel-video"
-                            src={item.video}
-                            autoPlay={index === currentIndex}
-                            muted
-                            playsInline
-                            loop
-                            preload={index === currentIndex ? "auto" : "metadata"}
-                            onLoadedMetadata={() => console.log("Video loaded:", item._id)}
-                            onError={(e) => handleVideoError(item._id, e)}
-                        />
+          <div
+            className="stage-track"
+            style={{ transform: `translateY(-${currentIndex * 100}%)` }}
+          >
+            {visibleVideos.length === 0 && (
+              <section className="stage-slide">
+                <div className="stage-fallback">No video available</div>
+              </section>
+            )}
 
-                        <div className="reel-overlay">
-                            <div className="reel-overlay-gradient" aria-hidden="true"></div>
-                            <div className="reel-content">
-                                <p className="reel-description" title={item.description}>
-                                    {item.description}
-                                </p>
-                                <div className="reel-buttons">
-                                    <Link className="reel-btn visit-btn" to="/food-partner/profile" aria-label="Visit store">
-                                        🏪 Visit Store
-                                    </Link>
-                                    <button className="reel-btn share-btn" aria-label="Share">
-                                        📤 Share
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                ))}
-            </div>
-        </div>
-    )
+            {visibleVideos.map((item) => {
+              const isReady = readyVideoIds.includes(item._id)
+
+              return (
+                <section className="stage-slide" key={item._id}>
+                  <video
+                    ref={setVideoRef(item._id)}
+                    className="stage-video"
+                    src={item.video}
+                    muted
+                    playsInline
+                    loop
+                    preload="metadata"
+                    onCanPlay={() => handleVideoReady(item._id)}
+                    onLoadedData={() => handleVideoReady(item._id)}
+                    onError={() => handleVideoError(item._id)}
+                  />
+
+                  {!isReady && (
+                    <div className="stage-loading" aria-hidden="true">
+                      <span>Loading video...</span>
+                    </div>
+                  )}
+
+                  <div className="stage-gradient" aria-hidden="true" />
+
+                  <aside className="stage-actions" aria-label="Video actions">
+                    <button onClick={()=>Likevideo(item)} type="button" className="stage-action-btn">
+                      <HeartIcon />
+                      <span>Likes: {getCount(item, ['LikeCount', 'likesCount', 'likes','likeCount'])}</span>
+                    </button>
+                    <button type="button" className="stage-action-btn">
+                      <BookmarkIcon />
+                      <span>Save: {getCount(item, ['savesCount', 'saveCount', 'savedCount'])}</span>
+                    </button>
+                    <button type="button" className="stage-action-btn">
+                      <CommentIcon />
+                      <span>Comment: {getCount(item, ['commentsCount', 'commentCount', 'comments'])}</span>
+                    </button>
+                  </aside>
+
+                  <div className="stage-content">
+                    <p className="stage-description" title={item?.description}>
+                      {item?.description || 'No video available'}
+                    </p>
+                    <Link className="stage-store-btn" to="/food-partner/profile">
+                      visit store
+                    </Link>
+                  </div>
+                </section>
+              )
+            })}
+          </div>
+        </section>
+
+        <PhoneBottomNav />
+      </main>
+    </div>
+  )
 }
 
 export default Home

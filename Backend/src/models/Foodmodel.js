@@ -10,12 +10,27 @@ const foodSchema = new Schema(
             type:String,
             required:true,
         },
+        videoFilePath: {
+            type: String,
+        },
         description:{
             type:String,
         },
         foodPartner : {
             type:mongoose.Schema.Types.ObjectId,
             ref:"FoodPartner",
+        },
+        likeCount :{
+            type:Number,
+            default:0,
+        },
+        savesCount :{
+            type:Number,
+            default:0,
+        },
+        commentsCount: {
+            type: Number,
+            default: 0,
         }
     }
 )

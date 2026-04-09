@@ -28,7 +28,7 @@ function FoodPartnerLogin() {
       notify();
       const partnerId = response.data?.partner?._id;
       if (partnerId) {
-        navigate(`/create-food/${partnerId}`);
+        navigate(`/food-partner/create-food`);
       }
     } catch (err) {
       console.error(err.response?.data || err.message);

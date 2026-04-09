@@ -6,17 +6,17 @@ import { User } from "../models/user.model.js";
 
 async function AuthFoodPartnerMiddleware(req,res,next){
     const token = req.cookies.token 
-    console.log("token : " ,token)
+    //console.log("token : " ,token)
     if(!token){
-        res.status(401).json({
+        return res.status(401).json({
             message : "Please login first"
         })
     }
     try {
         const decodedtoken= jwt.verify(token,process.env.JWT_SECRET)
-        console.log("decodedtoken : " ,decodedtoken)
+        //console.log("decodedtoken : " ,decodedtoken)
         const foodPartner=await FoodPartner.findById(decodedtoken._id).select("-password");
-        console.log("foodPartner : " ,foodPartner )
+        //console.log("foodPartner : " ,foodPartner )
         req.foodPartner=foodPartner;
         next();
     } catch (error) {
@@ -28,19 +28,18 @@ async function AuthFoodPartnerMiddleware(req,res,next){
 
 async function AuthUserMiddleware(req,res,next){
      const token = req.cookies.token 
-    console.log("token : " ,token)
+    //console.log("token : " ,token)
     if(!token){
-        res.status(401).json({
+        return res.status(401).json({
             message : "Please login first"
         })
     }
     try {
-        console.log("TOKEN:", token)
-        console.log("DECODED:", decodedtoken)
-        console.log("FOUND USER:", foodPartner)
         const decodedtoken= jwt.verify(token,process.env.JWT_SECRET)
+        //console.log(decodedtoken)
         const loggeduser=await User.findById(decodedtoken._id).select("-password");
-        req.loggeduser=loggeduser
+       // console.log(loggeduser)
+        req.user=loggeduser
         next();
     } catch (error) {
         return res.status(401).json({
