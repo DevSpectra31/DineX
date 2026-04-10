@@ -17,6 +17,11 @@ async function AuthFoodPartnerMiddleware(req,res,next){
         //console.log("decodedtoken : " ,decodedtoken)
         const foodPartner=await FoodPartner.findById(decodedtoken._id).select("-password");
         //console.log("foodPartner : " ,foodPartner )
+        if(!foodPartner){
+            return res.status(401).json({
+                message :" food partner not exist"
+            })
+        }
         req.foodPartner=foodPartner;
         next();
     } catch (error) {
@@ -38,7 +43,12 @@ async function AuthUserMiddleware(req,res,next){
         const decodedtoken= jwt.verify(token,process.env.JWT_SECRET)
         //console.log(decodedtoken)
         const loggeduser=await User.findById(decodedtoken._id).select("-password");
-       // console.log(loggeduser)
+        //console.log("loggeduser : ",loggeduser)
+        if(!loggeduser){
+            return res.status(401).json({
+                message : "user not found"
+            })
+        }
         req.user=loggeduser
         next();
     } catch (error) {

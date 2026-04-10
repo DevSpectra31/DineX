@@ -88,8 +88,8 @@ async function GetFoodItem(req,res){
 }
 async function likeFood(req,res){
     const foodId = req.body?.foodId;
-    const user = req.user;
-    //console.log(foodId);
+    const user = req.user._id;
+    console.log("user : ",user);
 
     if (!foodId) {
         return res.status(400).json({
@@ -151,7 +151,8 @@ async function SaveFood(req,res){
         })
 
         return res.status(200).json({
-            message: "Food unsaved successfully"
+            message: "Food unsaved successfully",
+            action : "unsaved",
         })
     }
 
@@ -166,7 +167,20 @@ async function SaveFood(req,res){
 
     res.status(201).json({
         message: "Food saved successfully",
-        save
+        action : "saved",
     })
 }
-export{CreateFood,GetFoodItem,likeFood,SaveFood}
+async function getSavefood(req,res){
+    const user = req.user;
+    const savedfood = await Save.find({user : user._id}).populate('food');
+    if(!savedfood || savedfood.length == 0){
+        return res.status(404).json({
+            message : "no saved food",
+        })
+    }
+    return res.status(201).json({
+        message : "saved food retrieved",
+        savedfood,
+    })
+}
+export{CreateFood,GetFoodItem,likeFood,SaveFood,getSavefood}

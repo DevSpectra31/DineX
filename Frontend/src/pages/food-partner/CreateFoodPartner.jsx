@@ -55,13 +55,20 @@ const CreateFood = () => {
         formData.append('name', name);
         formData.append('description', description);
         formData.append("video", videoFile);
-
-        const response = await axios.post("http://localhost:5000/api/food", formData, {
-            withCredentials: true,
-        })
-
-        console.log(response.data);
-        navigate("/"); // Redirect to home or another page after successful creation
+        axios
+           .post('http://localhost:5000/api/food/create-food',formData, { withCredentials: true })
+           .then((response) => {
+                if (Array.isArray(response.data?.fooditems)) {
+                    console.log(response.data)
+                    navigate("/")
+                }
+         })
+           .catch((error)=>{
+            if(error.response?.status === 401){
+                navigate("food-partner/login")
+            }
+           })
+        // Redirect to home or another page after successful creation
         // Optionally reset
         // setName(''); setDescription(''); setVideoFile(null);
     };

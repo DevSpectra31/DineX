@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import axios from 'axios'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import PhoneBottomNav from '../../components/reels/PhoneBottomNav'
 import { BookmarkIcon, CommentIcon, HeartIcon } from '../../components/reels/ReelIcons'
 import '../../styles/ShortVideoUI.css'
+import { Navigate } from 'react-router-dom'
 
 const getCount = (item, keys) => {
   for (const key of keys) {
@@ -15,6 +16,7 @@ const getCount = (item, keys) => {
 }
 
 const Home = () => {
+  const navigate = useNavigate();
   const [videos, setVideos] = useState([])
   const [failedVideoIds, setFailedVideoIds] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -22,7 +24,6 @@ const Home = () => {
   const wheelLockedRef = useRef(false)
   const touchStartYRef = useRef(0)
   const videoRefs = useRef(new Map())
-
   useEffect(() => {
     axios
       .get('http://localhost:5000/api/food/', { withCredentials: true })
@@ -33,7 +34,9 @@ const Home = () => {
         }
       })
       .catch((error) => {
-        console.error('API Error:', error)
+if (error.response?.status === 401) {
+        navigate("/user/login");
+}
       })
   }, [])
 
@@ -71,7 +74,7 @@ const Home = () => {
   const handleWheel = (event) => {
     if (visibleVideos.length <= 1) return
 
-    event.preventDefault()
+   // event.preventDefault()
     if (wheelLockedRef.current) return
 
     wheelLockedRef.current = true
@@ -165,6 +168,37 @@ const Home = () => {
     })
   );
 }
+async function Savideo(item) {
+  const response = await axios.post(
+    'http://localhost:5000/api/food/save',
+    { foodId: item._id },
+    { withCredentials: true }
+  );
+
+  const action = response.data?.action;
+
+  setVideos((prev) =>
+    prev.map((v) => {
+      if (v._id !== item._id) return v;
+
+      if (action === "saved") {
+        return {
+          ...v,
+          savesCount: (v.savesCount || 0) + 1,
+        };
+      }
+
+      if (action === "unsaved") {
+        return {
+          ...v,
+          savesCount: Math.max(0, (v.savesCount || 0) - 1),
+        };
+      }
+
+      return v;
+    })
+  );
+  }
   return (
     <div className="short-video-screen">
       <main className="phone-shell video-shell" aria-label="Video feed">
@@ -217,7 +251,7 @@ const Home = () => {
                       <HeartIcon />
                       <span>Likes: {getCount(item, ['LikeCount', 'likesCount', 'likes','likeCount'])}</span>
                     </button>
-                    <button type="button" className="stage-action-btn">
+                    <button onClick={()=>(Savideo(item))} type="button" className="stage-action-btn">
                       <BookmarkIcon />
                       <span>Save: {getCount(item, ['savesCount', 'saveCount', 'savedCount'])}</span>
                     </button>
@@ -247,4 +281,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default Home;
