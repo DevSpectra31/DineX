@@ -1,0 +1,153 @@
+.page { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+.topBar {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+}
+.title { font-size: 1.8rem; font-weight: 800; }
+.sub { color: var(--text-muted); margin-top: 4px; font-size: 0.95rem; }
+
+/* Message banner */
+.msgBanner {
+  padding: 12px 16px; border-radius: 10px;
+  font-size: 0.9rem; font-weight: 500;
+  margin-bottom: 20px;
+}
+.msgError   { background: rgba(255,77,77,0.12);  color: #FF6B6B; border: 1px solid rgba(255,77,77,0.3); }
+.msgSuccess { background: rgba(34,197,94,0.12);  color: #22C55E; border: 1px solid rgba(34,197,94,0.3); }
+
+/* Stats */
+.statsGrid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 14px; margin-bottom: 28px;
+}
+.statCard {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+  display: flex; align-items: center; gap: 14px;
+}
+.statIcon { font-size: 1.6rem; }
+.statValue { font-size: 1.4rem; font-weight: 800; line-height: 1.2; }
+.statLabel { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+/* Upload card */
+.uploadCard {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px; margin-bottom: 28px;
+}
+.uploadCard h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
+.uploadNote {
+  font-size: 0.82rem; color: var(--text-muted);
+  margin-bottom: 20px; line-height: 1.5;
+}
+.uploadNote code {
+  background: var(--bg-elevated); padding: 1px 6px;
+  border-radius: 4px; font-family: monospace; font-size: 0.8rem;
+}
+
+/* Upload form */
+.uploadForm { display: flex; flex-direction: column; gap: 14px; }
+
+.fileDropZone {
+  border: 2px solid var(--border); border-radius: 10px;
+  background: var(--bg-elevated); transition: border-color 0.2s;
+  overflow: hidden;
+}
+.fileDropZone:hover { border-color: var(--primary); }
+
+.fileLabel {
+  display: flex; align-items: center; justify-content: center;
+  padding: 18px 20px; cursor: pointer;
+  font-size: 0.9rem; color: var(--text-muted);
+  min-height: 64px; text-align: center;
+}
+.fileLabel em { font-style: normal; color: var(--text-muted); font-size: 0.82rem; margin-left: 6px; }
+.fileSelected { color: var(--text); font-weight: 600; }
+
+.hiddenInput { display: none; }
+
+.formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); }
+.field label em { font-style: normal; font-weight: 400; }
+.field input, .field select, .field textarea { width: 100%; }
+.field textarea { resize: vertical; }
+
+/* Progress bar */
+.progressWrap {
+  background: var(--bg-elevated); border-radius: 8px;
+  padding: 12px 14px; position: relative; overflow: hidden;
+}
+.progressBar {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: rgba(255,77,77,0.2);
+  transition: width 0.3s ease;
+}
+.progressWrap span {
+  position: relative; font-size: 0.85rem; color: var(--text);
+}
+
+.submitBtn { align-self: flex-start; padding: 12px 28px; font-size: 0.95rem; }
+
+/* Reels section */
+.reelsSection { margin-top: 4px; }
+.reelsSection h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; }
+.count { color: var(--text-muted); font-weight: 400; }
+
+.empty {
+  text-align: center; padding: 60px 20px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text-muted);
+}
+.empty span { font-size: 3rem; display: block; margin-bottom: 12px; }
+
+.reelsList { display: flex; flex-direction: column; gap: 10px; }
+
+.reelRow {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 16px;
+  transition: border-color 0.15s;
+}
+.reelRow:hover { border-color: var(--text-muted); }
+
+.reelThumb {
+  width: 72px; height: 72px; border-radius: 8px;
+  background: var(--bg-elevated); overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; flex-shrink: 0;
+}
+.reelThumb img, .videoThumb { width: 100%; height: 100%; object-fit: cover; }
+
+.reelInfo { flex: 1; min-width: 0; }
+.reelInfo h3 {
+  font-size: 0.95rem; font-weight: 600;
+  margin-bottom: 6px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+
+.reelMeta {
+  display: flex; gap: 14px; font-size: 0.82rem;
+  color: var(--text-muted); flex-wrap: wrap; margin-bottom: 4px;
+}
+.pub { color: #22C55E !important; }
+.draft { color: #FFB347 !important; }
+
+.cdnLink { font-size: 0.78rem; color: var(--primary); }
+.cdnLink:hover { text-decoration: underline; }
+
+.reelActions { display: flex; gap: 8px; flex-shrink: 0; }
+
+.deleteBtn {
+  background: rgba(255,77,77,0.1);
+  color: var(--primary);
+  border: 1px solid rgba(255,77,77,0.25);
+}
+.deleteBtn:hover { background: var(--primary); color: white; }
+
+@media (max-width: 640px) {
+  .formRow { grid-template-columns: 1fr; }
+  .reelRow { flex-wrap: wrap; }
+  .statsGrid { grid-template-columns: repeat(2, 1fr); }
+}

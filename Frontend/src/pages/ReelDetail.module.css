@@ -1,0 +1,90 @@
+.page { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 32px;
+  align-items: start;
+}
+
+.videoPanel { position: sticky; top: 80px; }
+
+.video {
+  width: 100%;
+  border-radius: var(--radius);
+  background: #000;
+  max-height: 75vh;
+}
+
+.infoPanel { overflow-y: auto; }
+
+.author {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.authorAvatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--primary); display: flex; align-items: center; justify-content: center;
+  font-weight: 700; overflow: hidden;
+}
+.authorAvatar img { width: 100%; height: 100%; object-fit: cover; }
+.authorName { font-weight: 700; font-size: 1rem; }
+.authorName:hover { color: var(--primary); }
+
+.title { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+
+.desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 14px; line-height: 1.6; }
+
+.meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+
+.tag {
+  background: rgba(255,77,77,0.1);
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.restaurant { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px; }
+
+.stats {
+  display: flex; gap: 16px;
+  font-size: 0.85rem; color: var(--text-muted);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.actions { display: flex; gap: 10px; margin-bottom: 24px; }
+
+.liked { background: rgba(255,77,77,0.15); color: var(--primary); border: 1px solid rgba(255,77,77,0.3); }
+.saved { background: rgba(255,179,71,0.15); color: #FFB347; border: 1px solid rgba(255,179,71,0.3); }
+
+.comments h2 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+
+.commentForm { display: flex; gap: 8px; margin-bottom: 20px; }
+.commentForm input { flex: 1; }
+.commentForm .btn { flex-shrink: 0; }
+
+.noComments { color: var(--text-muted); font-size: 0.9rem; }
+
+.commentList { display: flex; flex-direction: column; gap: 14px; }
+
+.comment { display: flex; gap: 10px; }
+
+.commentAvatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--primary); display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+}
+
+.commentUser { font-weight: 700; font-size: 0.85rem; margin-right: 8px; color: var(--primary); }
+
+.comment p { font-size: 0.9rem; margin-top: 2px; }
+
+.commentTime { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: block; }
+
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+  .videoPanel { position: static; }
+}
