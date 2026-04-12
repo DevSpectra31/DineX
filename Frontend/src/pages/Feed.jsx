@@ -11,12 +11,10 @@ export default function Feed() {
   const [activeCuisine, setActiveCuisine] = useState('All');
 
   // Initial load and on cuisine change — always reset to page 1
-  useEffect(() => {
+useEffect(() => {
     const cuisine = activeCuisine === 'All' ? '' : activeCuisine;
     fetchReels(1, cuisine);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeCuisine]);
-
+  }, [activeCuisine, fetchReels]);
   const loadMore = useCallback(() => {
     if (page < totalPages && !loading) {
       const cuisine = activeCuisine === 'All' ? '' : activeCuisine;

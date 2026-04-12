@@ -11,7 +11,7 @@ export default function Footer() {
 
         {/* Brand */}
         <div className={styles.brand}>
-          <Link to="/" className={styles.logo}>ine<span>X</span></Link>
+          <Link to="/" className={styles.logo}>Dine<span>X</span></Link>
           <p className={styles.tagline}>
             Discover the best food reels from restaurants and creators near you.
           </p>
@@ -55,7 +55,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className={styles.bottom}>
-        <p>© {year} ineX. All rights reserved.</p>
+        <p>© {year} DineX. All rights reserved.</p>
         <p className={styles.madeWith}>Made with ❤️ for food lovers</p>
       </div>
     </footer>
