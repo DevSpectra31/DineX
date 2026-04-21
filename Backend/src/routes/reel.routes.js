@@ -8,7 +8,7 @@ const {
   addComment,
   deleteComment,
 } = require('../controllers/reel.controller');
-const { protect, optionalAuth } = require('../middleware/auth.middleware');
+const { protect, optionalAuth } = require('../Middlewares/auth.middleware');
 
 router.get('/', getFeed);
 router.get('/:id',optionalAuth, getReelById);

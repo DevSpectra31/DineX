@@ -1,4 +1,4 @@
-const { searchFoodVideos, getPopularVideos } = require('../services/pexels.service');
+const { searchFoodVideos, getPopularVideos } = require('../services/pexel.js');
 
 const FOOD_QUERIES = [
   'indian food', 'italian food', 'japanese food',

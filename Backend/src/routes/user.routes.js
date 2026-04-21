@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Reel = require('../models/Reel');
-const { protect } = require('../middleware/auth.middleware');
+const { protect } = require('../Middlewares/auth.middleware.js');
 
 // GET /api/users/:username - Public profile
 router.get('/:username', async (req, res) => {

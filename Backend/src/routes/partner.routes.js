@@ -6,8 +6,8 @@ const {
   uploadReel,
   updateReel,
   deleteReel,
-} = require('../controllers/partner.controller');
-const { protect, restrictTo } = require('../middleware/auth.middleware');
+} = require('../controllers/FoodPartner.controller.js');
+const { protect, restrictTo } = require('../Middlewares/auth.middleware.js');
 
 // All partner routes require authentication + partner/admin role
 router.use(protect, restrictTo('partner', 'admin'));

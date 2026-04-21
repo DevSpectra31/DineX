@@ -1,61 +1,49 @@
-import { FoodModel } from "../models/Foodmodel.js";
-import jwt from "jsonwebtoken";
-import { FoodPartner } from "../models/FoodPartner.js";
-import { User } from "../models/user.model.js";
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
+// Verify JWT from HTTP-only cookie
+const protect = async (req, res, next) => {
+  try {
+    const token = req.cookies.jwt;
 
-async function AuthFoodPartnerMiddleware(req,res,next){
-    const token = req.cookies.token 
-    //console.log("token : " ,token)
-    if(!token){
-        return res.status(401).json({
-            message : "Please login first"
-        })
+    if (!token) {
+      return res.status(401).json({ error: 'Not authorized. No token provided.' });
     }
-    try {
-        const decodedtoken= jwt.verify(token,process.env.JWT_SECRET)
-        //console.log("decodedtoken : " ,decodedtoken)
-        const foodPartner=await FoodPartner.findById(decodedtoken._id).select("-password");
-        //console.log("foodPartner : " ,foodPartner )
-        if(!foodPartner){
-            return res.status(401).json({
-                message :" food partner not exist"
-            })
-        }
-        req.foodPartner=foodPartner;
-        next();
-    } catch (error) {
-        return res.status(401).json({
-            message: error.message
-        })
-    }
-}
 
-async function AuthUserMiddleware(req,res,next){
-     const token = req.cookies.token 
-    //console.log("token : " ,token)
-    if(!token){
-        return res.status(401).json({
-            message : "Please login first"
-        })
-    }
-    try {
-        const decodedtoken= jwt.verify(token,process.env.JWT_SECRET)
-        //console.log(decodedtoken)
-        const loggeduser=await User.findById(decodedtoken._id).select("-password");
-        //console.log("loggeduser : ",loggeduser)
-        if(!loggeduser){
-            return res.status(401).json({
-                message : "user not found"
-            })
-        }
-        req.user=loggeduser
-        next();
-    } catch (error) {
-        return res.status(401).json({
-            message: error.message
-        })
-    }
-}
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
 
-export{AuthFoodPartnerMiddleware,AuthUserMiddleware};
+    if (!user || !user.isActive) {
+      return res.status(401).json({ error: 'User not found or deactivated.' });
+    }
+
+    req.user = user;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Token invalid or expired.' });
+  }
+};
+
+// Restrict to specific roles
+const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Access denied. Insufficient permissions.' });
+    }
+    next();
+  };
+};
+// Attaches user to req if token exists, but doesn't block the request if not
+const optionalAuth = async (req, res, next) => {
+  try {
+    const token = req.cookies.jwt;
+    if (!token) return next(); // no token — continue as guest
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select('-password');
+  } catch {
+    // Invalid token — just continue as guest
+  }
+  next();
+};
+
+module.exports = { protect, restrictTo, optionalAuth };

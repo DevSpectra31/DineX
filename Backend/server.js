@@ -5,11 +5,11 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const authRoutes    = require('./routes/auth.routes');
-const reelRoutes    = require('./routes/reel.routes');
-const userRoutes    = require('./routes/user.routes');
-const partnerRoutes = require('./routes/partner.routes');
-const exploreRoutes = require('./routes/explore.route.js');
+const authRoutes    = require('./src/routes/auth.routes.js');
+const reelRoutes    = require('./src/routes/reel.routes.js');
+const userRoutes    = require('./src/routes/user.routes.js');
+const partnerRoutes = require('./src/routes/partner.routes.js');
+const exploreRoutes = require('./src/routes/explore.route.js');
 
 const app = express();
 
